@@ -17,7 +17,16 @@
 
 window.findNRooksSolution = function(n) {
   var solution = undefined; //fixme
+  //have a counter variable for how many rooks have been placed 
 
+  //loop through possible column index numbers
+    //try placing a rook at row 0[index] -- first rook will obviously pass
+
+    //skip to next row and place a new rook in the next column. Each time rook is placed successfully, increment counter by 1
+
+    //skip to next row...
+
+    //When we hit the last row, if counter variable equals n, return board as a solution. Otherwise, start again with new starting position
   console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
   return solution;
 };
