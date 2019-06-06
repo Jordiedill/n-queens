@@ -96,8 +96,56 @@ window.countNRooksSolutions = function(n) {
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
-  var solution = undefined; //fixme
+  //have a counter variable for how many rooks have been placed 
+  let counter = 0;
+  //have an empty array to store column indexes on the board already
+  let columns = []; //[0]
+  let startingColumn = 0;
+  //create a new board that is nxn
+  let ourBoard = new Board({n:n});
+  let solution;
+  
 
+  let looper = function() {
+    //loop over rows from 0 to n
+    for (var row = 0; row < n; row++) { //row is at 1
+      //if we're in the first row...
+      if (row === 0) {
+        //add a piece at the "starting column" in the first row
+        ourBoard.togglePiece(row,startingColumn);
+        columns.push(startingColumn);
+        counter++;
+        continue;
+      }
+      for (var col=0; col < n; col++) { //col = 1
+        if (columns.indexOf(col) > -1) {
+          continue;
+        }
+        ourBoard.togglePiece(row,col);
+        if (ourBoard.hasAnyQueensConflicts() === true) {
+          ourBoard.togglePiece(row,col);
+          continue
+        } else {
+          columns.push(col);
+          counter++
+          break;
+        }
+        
+      }
+      continue;
+    }
+    if (counter === n) {
+      solution = ourBoard.rows();
+    } else {
+      counter = 0;
+      startingColumn++;
+      columns = [];
+      return looper();
+    }
+  }
+
+  looper()
+   //fixme
   console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
   return solution;
 };
@@ -138,7 +186,7 @@ window.countNQueensSolutions = function(n) {
     for (let j = 0; j < coordinates.length; j++) {
       board.togglePiece(j,coordinates[j])
     }
-    if (!board.hasAnyQueensConflicts()) {
+    if (!board.hasAnyMajorDiagonalConflicts() && !board.hasAnyMinorDiagonalConflicts()) {
       solutionCount++;
     } 
   }
