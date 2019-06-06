@@ -20,7 +20,7 @@ window.findNRooksSolution = function(n) {
   let counter = 0;
   //have an empty array to store column indexes on the board already
   let columns = []; //[0]
- 
+  let startingColumn = 0;
   //create a new board that is nxn
   let ourBoard = new Board({n:n});
   let solution;
@@ -72,22 +72,24 @@ window.findNRooksSolution = function(n) {
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
   let solutionCount = 0; 
-  let permute = function(n) {
-    let numbers = Array.from(Array(n).keys())
-    let result = []
-    let recurse = function(options,n) {
-      if (n===0) {
-        result.push(options)
+  const permutations = function(n) {
+    let result = [];
+    const recurse = function(possibleNumbers, solution = []) {
+      if(possibleNumbers.length === 0) {
+        result.push(solution);
+        solutionCount++
       } else {
-        for(let x=0; x <numbers.length; x++) {
-          recurse(options.concat(numbers[x], n -1))
+        for(let i = 0; i < possibleNumbers.length; i++) {
+          let curNum = possibleNumbers.slice();
+          let nextNum = curNum.splice(i, 1);
+          recurse(curNum.slice(), solution.concat(nextNum));
         }
       }
     }
-    recurse([],n);
+    recurse(Array.from(Array(n).keys()))
     return result;
-
   }
+  permutations(n)
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
 };
@@ -102,8 +104,44 @@ window.findNQueensSolution = function(n) {
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n) {
-  var solutionCount = undefined; //fixme
+  var solutionCount = 0; //fixme
+  if (n === 0 || n === 1) {
+    solutionCount = 1;
+    return solutionCount;
+  }
 
+  if (n === 2 || n === 3) {
+    solutionCount = 0;
+    return solutionCount;
+  }
+
+  const permutations = function(n) {
+    let result = [];
+    const recurse = function(possibleNumbers, solution = []) {
+      if(possibleNumbers.length === 0) {
+        result.push(solution);
+      } else {
+        for(let i = 0; i < possibleNumbers.length; i++) {
+          let curNum = possibleNumbers.slice();
+          let nextNum = curNum.splice(i, 1);
+          recurse(curNum.slice(), solution.concat(nextNum));
+        }
+      }
+    }
+    recurse(Array.from(Array(n).keys()))
+    return result;
+  }
+  let boardCombos = permutations(n)
+  for (let i = 0; i < boardCombos.length; i++) {
+    let board = new Board({n:n});
+    let coordinates = boardCombos[i];
+    for (let j = 0; j < coordinates.length; j++) {
+      board.togglePiece(j,coordinates[j])
+    }
+    if (!board.hasAnyQueensConflicts()) {
+      solutionCount++;
+    } 
+  }
   console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
 };
